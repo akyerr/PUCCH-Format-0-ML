@@ -39,8 +39,8 @@ model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['ac
 path_to_data = f"{os.getcwd()}/Datasets/"
 dataset_size = 200_000
 
-separate_sim = False
-separate_hw = True
+separate_sim = True
+separate_hw = False
 combined_hw = False
 
 if combined_hw:
