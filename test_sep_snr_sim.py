@@ -24,6 +24,7 @@ plt.style.use('seaborn-whitegrid')
 
 
 def test_sep_snr_sim(model, test_SNR, dataset_size, path_to_data):
+    norm_tx, norm_rx = 1, 1
     num_train = int(0.75 * dataset_size)
     num_test = int(dataset_size - num_train)
     #----------------------------------------Test multiple SNRs----------------------------------------#
@@ -31,22 +32,25 @@ def test_sep_snr_sim(model, test_SNR, dataset_size, path_to_data):
     final_test_loss = zeros(len(test_SNR), dtype=float)
     final_test_accuracy = zeros(len(test_SNR), dtype=float)
 
+
     for idx, snr in enumerate(test_SNR):
         print(f'-----------------------------Sim testing SNR = {snr} dB--------------------------------')
 
         #----------------------------------------Test sim data----------------------------------------#
-        filename_test = f"{path_to_data}pucch_data_slot_13_14_fading_{snr}dB_{int(dataset_size/1000)}k.mat"
+        filename_test = f'{path_to_data}/Sim_data/pucch_fading_{snr}dB_{int(dataset_size/1000)}k_norm_tx_{norm_tx}_norm_rx_{norm_rx}.mat'
         data = sio.loadmat(filename_test)
         X = data['X']
         Y = data['Y']
-        Z = zeros((len(Y), 1))
-        for i in range(len(Y)):
-            if Y[i] == 3:
-                Z[i] = 1
-            elif Y[i] == 6:
-                Z[i] = 2
-            elif Y[i] == 9:
-                Z[i] = 3
+
+        Z = Y
+        # Z = zeros((len(Y), 1))
+        # for i in range(len(Y)):
+        #     if Y[i] == 3:
+        #         Z[i] = 1
+        #     elif Y[i] == 6:
+        #         Z[i] = 2
+        #     elif Y[i] == 9:
+        #         Z[i] = 3
 
         Z = to_categorical(Z)
 
@@ -60,22 +64,22 @@ def test_sep_snr_sim(model, test_SNR, dataset_size, path_to_data):
         final_test_loss[idx] = test_loss
         final_test_accuracy[idx] = test_acc * 100
 
-        predictions = model.predict(x_test)
+        # predictions = model.predict(x_test)
 
-        recovered_CS = zeros(predictions.shape[0], dtype=int)
-        applied_CS = zeros(predictions.shape[0], dtype=int)
-        possible_CS = [0, 1, 2, 3]
-        for i in range(predictions.shape[0]):
-            recovered_CS[i] = possible_CS[argmax(predictions[i, :])]
-            applied_CS[i] = possible_CS[argmax(z_test[i, :])]
+        # recovered_CS = zeros(predictions.shape[0], dtype=int)
+        # applied_CS = zeros(predictions.shape[0], dtype=int)
+        # possible_CS = [0, 1, 2, 3]
+        # for i in range(predictions.shape[0]):
+        #     recovered_CS[i] = possible_CS[argmax(predictions[i, :])]
+        #     applied_CS[i] = possible_CS[argmax(z_test[i, :])]
 
-        conf_mat = tf.math.confusion_matrix(applied_CS, recovered_CS)
-        plt.figure(figsize=(10, 8))
-        sns.set(font_scale=1.6)
-        sns.heatmap(conf_mat, xticklabels=["0", "3", "6", "9"], yticklabels=["0", "3", "6", "9"], annot=True, fmt="g", linewidths=.5)
-        plt.xlabel('Prediction (NN Classified Cyclic Shift)', fontsize=16, fontweight="bold")
-        plt.ylabel('Label (Applied Cyclic Shift)', fontsize=16, fontweight="bold")
-        plt.title(f'Confusion Matrix for Simulated Test Dataset at SNR = {snr}dB', fontsize=16, fontweight="bold")
-        plt.savefig(f'./Plots/Conf_mtx_sim_{snr}_dB.png', dpi=400)
+        # conf_mat = tf.math.confusion_matrix(applied_CS, recovered_CS)
+        # plt.figure(figsize=(10, 8))
+        # sns.set(font_scale=1.6)
+        # sns.heatmap(conf_mat, xticklabels=["0", "3", "6", "9"], yticklabels=["0", "3", "6", "9"], annot=True, fmt="g", linewidths=.5)
+        # plt.xlabel('Prediction (NN Classified Cyclic Shift)', fontsize=16, fontweight="bold")
+        # plt.ylabel('Label (Applied Cyclic Shift)', fontsize=16, fontweight="bold")
+        # plt.title(f'Confusion Matrix for Simulated Test Dataset at SNR = {snr}dB', fontsize=16, fontweight="bold")
+        # plt.savefig(f'./Plots/Conf_mtx_sim_{snr}_dB.png', dpi=400)
 
     return final_test_loss, final_test_accuracy

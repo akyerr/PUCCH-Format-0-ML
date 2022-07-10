@@ -26,21 +26,17 @@ plt.style.use('seaborn-whitegrid')
 
 
 def neural_net_model():
-    # Build Neural Network and Train
-    # input_signal = Input(shape=(24,), name='input_layer')
-    # x = Dense(64, activation='relu')(input_signal)
-    # x = Dropout(rate=0.5)(x)
-    # x = Dense(64, activation='relu')(x)
-    # x = Dropout(rate=0.5)(x)
-    # x = Dense(64, activation='relu')(x)
-    # x = Dropout(rate=0.5)(x)
-    # output_pred = Dense(4, activation='softmax')(x)
-    input_signal = Input(shape=(24,), name='input_layer')
-    x = Dense(128, activation='relu')(input_signal)
+
+    input_size = 24
+    #------Build Neural Network------#
+    input_signal = Input(shape=(input_size,), name='input_layer')
+    x = Dense(128, activation='relu', name='fc_0')(input_signal)
     x = Dropout(rate=0.5)(x)
-    x = Dense(128, activation='relu')(x)
+    x = Dense(128, activation='relu', name='fc_1')(x)
     x = Dropout(rate=0.5)(x)
-    output_pred = Dense(4, activation='softmax')(x)
+    output_pred = Dense(12, activation='softmax', name='output_layer')(x)
+
+    #------Build NN Model------#
     model = Model(input_signal, output_pred)
 
     return model
